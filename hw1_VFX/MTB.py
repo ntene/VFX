@@ -1,7 +1,8 @@
 import numpy as np
 import cv2
+import matplotlib.pyplot as plt
 
-def MTB(images, layer, img_N, noise=4):
+def MTB(images, layer, img_N, noise=5):
 	if layer > 0:
 		shrink_img = [cv2.resize(images[i], None, fx=1/2, fy=1/2) for i in range(img_N)]
 		shiftX, shiftY = MTB(shrink_img, layer-1, img_N)
@@ -14,6 +15,7 @@ def MTB(images, layer, img_N, noise=4):
 	median = [np.median(images[i]) for i in range(img_N)]
 	binary_img = [cv2.threshold(images[i], median[i], 255, cv2.THRESH_BINARY)[1] for i in range(img_N)]
 	mask_img = [cv2.inRange(images[i], median[i]-noise, median[i]+noise) for i in range(img_N)]
+
 	min_err = [float('Inf') for i in range(img_N)] 
 	rX = [0 for i in range(img_N)]
 	rY = [0 for i in range(img_N)]
@@ -46,9 +48,7 @@ def Alignment(images, shiftX, shiftY):
 
 def align(images, layer, num_images):
 	imgs = [images[i][:,:,1] for i in range(num_images)]
-	shiftX, shiftY = MTB(imgs, 3, num_images)
-	#shiftX = [0, 0, -4, -4, -3, -1, 4, -4, -4, 4, 2, -4, -4, -4]
-	#shiftY = [0, 0, -4, -4, -4, -4, -4, -4, 4, 4, -4, -4, -4, 4]
+	shiftX, shiftY = MTB(imgs, layer, num_images)
 	images = Alignment(images, shiftX, shiftY)
 	return images
 
