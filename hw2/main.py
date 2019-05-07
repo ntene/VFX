@@ -3,8 +3,8 @@ import sys
 from detection import *
 from local_similarity import *
 import os
-#from c_warp import *
-from warping import *
+from c_warp import *
+#from warping import *
 def readimg(path):
 	img = []
 	with open(os.path.join(path,'list'), 'r') as f:
@@ -25,7 +25,7 @@ if __name__ == '__main__':
 	features = []
 	descriptors = []
 	warp_img = []
-	for i,element in enumerate(img[0:2]):
+	for i,element in enumerate(img[0:3]):
 		element = warping(element,focal_len[i])
 		warp_img.append(element)
 		feature = HarrisDetection(element)
@@ -34,10 +34,12 @@ if __name__ == '__main__':
 
 	feature_maps = feature_matching(warp_img, features, descriptors)
 
+	result = warp_img[0]
 	for i,feature in enumerate(feature_maps):
-		h = ransac(feature, features[i+1], features[i])
-		height, width, _ = img[i].shape
-		img1_w = transform_p(warp_img[i], warp_img[i+1], h)
+		h = ransac(feature, features[i], features[i+1])
+		result = blending(result, warp_img[i+1], h)
+		cv2.imwrite("dst.jpg",result)
+		#img1_w = transform_p(warp_img[i], warp_img[i+1], h)
 		#cv2.imwrite('ww.jpg', img1_w)
 
 	#cv2_sift(img[0:2])
