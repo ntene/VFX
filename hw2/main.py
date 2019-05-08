@@ -25,20 +25,27 @@ if __name__ == '__main__':
 	features = []
 	descriptors = []
 	warp_img = []
-	for i,element in enumerate(img[0:3]):
+	for i,element in enumerate(img[0:2]):
 		element = warping(element,focal_len[i])
 		warp_img.append(element)
 		feature = HarrisDetection(element)
 		features.append(feature)
 		descriptors.append( gen_descriptor(element, feature) )
-
+	cv2.imwrite("ww.jpg",warp_img[0])
+	exit()
 	feature_maps = feature_matching(warp_img, features, descriptors)
-
+	print ("done feature_maps")
 	result = warp_img[0]
+	first_shift = 0
+	last_shift = 0
 	for i,feature in enumerate(feature_maps):
 		h = ransac(feature, features[i], features[i+1])
+		last_shift += h[0]
 		result = blending(result, warp_img[i+1], h)
 		cv2.imwrite("dst.jpg",result)
+	print (first_shift, last_shift)
+	crop = result[last_shift:result.shape[0]-last_shift,:]
+	cv2.imwrite("dst1.jpg",crop)
 		#img1_w = transform_p(warp_img[i], warp_img[i+1], h)
 		#cv2.imwrite('ww.jpg', img1_w)
 
