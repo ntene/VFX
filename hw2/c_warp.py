@@ -2,8 +2,9 @@ import math
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
-def warping(img, f):
-	f = 3000
+def warping(img):
+	f = 917.4311926605504
+	img = cv2.resize(img,(630,1120))
 	h, w, _ = img.shape
 	x_0 = round(f*math.atan((0-w/2)/f) + w/2)
 	xf = round(f*math.atan((w-w/2)/f) + w/2)
@@ -37,7 +38,7 @@ def ransac(match_features, feature1, feature2):
 		dist = match_pairs[:,0] - v_
 		inliers = 0
 		for j in range(dist.shape[0]):
-			if np.sum(np.square(dist[j])) < 1:
+			if np.sum(np.square(dist[j])) < 5:
 				inliers += 1
 		if inliers > max_inliers:
 			best_h = shift
@@ -52,30 +53,21 @@ def blending(img1, img2, shift):
 	shift[1] = img2.shape[1] - abs(shift[1])
 	result_h = img1.shape[0] + img2.shape[0] - abs(shift[0])
 	result_w = img1.shape[1] + img2.shape[1] - abs(shift[1])
-	print (result_h,result_w)
+
 	im_2_h, im_2_w,_ = img2.shape
 	im_1_h, im_1_w,_ = img1.shape
 	result_image = np.zeros((result_h,result_w,3))
-	result_image[0:im_2_h,0:im_2_w] = img2
 	result_image[result_h - im_1_h: result_h, result_w - im_1_w: result_w] = img1
-	print(result_w-im_1_w)
+	result_image[0:im_2_h,0:im_2_w] = img2
 
-	'''for x in range(result_w - im_1_w-20,result_w - im_1_w):
-		for y in range(0, im_2_h):
-			result_image[y][x] = 0.995*img2[y][x] 
-	temp = 0
-	for x in range(result_w-im_1_w, result_w-im_1_w+20):
-		for y in range(0, im_2_h):
-			result_image[y][x] = 0.2*img2[y][x] + 0.8*img1[y][temp] 
-		temp += 1'''
-
-	for y in range(0,im_2_h):
-		result_image[y][result_w - im_1_w] = 0.7*img2[y][result_w - im_1_w] +0.3*img1[y][0]
 
 	centre = int((im_2_w + result_w - im_1_w )/2)
-	for y in range(0,im_2_h):
-		result_image[y][centre] = 0
-	#0.5*img1[y+result_h-im_1_h+im_2_w-x_shift][x+result_w - im_1_w+im_2_w-x_shift] + 0.5*img2[y][x]
+	start = result_w - im_1_w #img1
+	start = centre
+	end = im_2_w
+	for x in range(centre, end):
+		for y in range(0,im_2_h):
+			result_image[y][x] = ((end-x)/(end-start))*img2[y][x] + ((x-start)/(end-start))*img1[y-result_h + im_1_h][x-result_w + im_1_w]
 
 	return result_image
 		
