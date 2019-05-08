@@ -10,16 +10,17 @@ def gradient(img):
 
 def HarrisDetection(img, blocksize=4, k=0.05):
 	gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+	cv2.imwrite("gray.jpg",gray)
 
 	# sample show
 	dest = cv2.cornerHarris(gray, blocksize, 5, k)
 	dest = cv2.dilate(dest, None)
 	image = img.copy()
-	image[dest > 0.4 * dest.max()]=[0, 0, 255]
-	keylist = np.array(np.where(dest > 0.4)).T
-	print (keylist.shape)
+	image[dest > 0.05 * dest.max()]=[0, 0, 255]
+	keylist = np.array(np.where(dest > 0.05 * dest.max())).T
+	#print (keylist.shape)
 	cv2.imwrite('sample.jpg',image)
-	return keylist
+	#return keylist
 	###
 
 	dx, dy = gradient(gray)
@@ -52,17 +53,20 @@ def HarrisDetection(img, blocksize=4, k=0.05):
 	cv2.imwrite('corner.jpg', image)
 	###
 
-	return keylist
-				
+	return np.array(keylist)
+			
 def gen_descriptor(img, keylist):
 	gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
+	h, w = gray.shape
 	descriptors = []
 	for key in keylist:
 		descriptor = []
+		if key[0] >= h-2 or key[0] < 2 or key[1] >= w-2 or key[1] < 2:
+			continue
 		for y in range(-2,3):
 			for x in range(-2,3):
 				descriptor.append(gray[key[0]+y][key[1]+x])
 		descriptors.append(descriptor)
-	return np.array(descriptors)	
+	return descriptors
 

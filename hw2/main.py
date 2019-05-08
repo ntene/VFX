@@ -21,30 +21,36 @@ def readf(path):
 
 if __name__ == '__main__':
 	img = readimg(sys.argv[1])
-	focal_len = readf(sys.argv[1])
+	#focal_len = readf(sys.argv[1])
+	#features = np.load('features.npy')
 	features = []
 	descriptors = []
 	warp_img = []
-	for i,element in enumerate(img[0:2]):
-		element = warping(element,focal_len[i])
+	for i,element in enumerate(img):
+		element = warping(element)
 		warp_img.append(element)
 		feature = HarrisDetection(element)
 		features.append(feature)
-		descriptors.append( gen_descriptor(element, feature) )
+		descriptors.append( gen_descriptor(element, features[i]) )
+	#features = np.save("features",features)
 	feature_maps = feature_matching(warp_img, features, descriptors)
-	print ("done feature_maps", len(feature_maps[0]))
+	
+	print ("done feature_maps", [len(x) for x in feature_maps])
 	result = warp_img[0]
-	first_shift = 0
-	last_shift = 0
 	for i,feature in enumerate(feature_maps):
 		h = ransac(feature, features[i], features[i+1])
-		last_shift += h[0]
 		result = blending(result, warp_img[i+1], h)
-		cv2.imwrite("dst.jpg",result)
-	print (first_shift, last_shift)
-	crop = result[last_shift:result.shape[0]-last_shift,:]
-	cv2.imwrite("dst1.jpg",crop)
-		#img1_w = transform_p(warp_img[i], warp_img[i+1], h)
-		#cv2.imwrite('ww.jpg', img1_w)
+		cv2.imwrite("1dst.jpg",result)
+	height_0, height_1 = 0,0
+	height, width = result.shape[:2]
 
-	#cv2_sift(img[0:2])
+	for i in range(height):
+		if not np.any(result[i]==0):
+			height_0 = i
+			break
+	for i in range(height-1,0,-1):
+		if not np.any(result[i]==0):
+			height_1 = i
+			break
+	crop = result[height_0:height_1,:]
+	cv2.imwrite("crop.jpg",crop)
