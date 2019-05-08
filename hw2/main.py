@@ -31,10 +31,8 @@ if __name__ == '__main__':
 		feature = HarrisDetection(element)
 		features.append(feature)
 		descriptors.append( gen_descriptor(element, feature) )
-	cv2.imwrite("ww.jpg",warp_img[0])
-	exit()
 	feature_maps = feature_matching(warp_img, features, descriptors)
-	print ("done feature_maps")
+	print ("done feature_maps", len(feature_maps[0]))
 	result = warp_img[0]
 	first_shift = 0
 	last_shift = 0
