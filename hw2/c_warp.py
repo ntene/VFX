@@ -9,10 +9,10 @@ def warping(img):
 	x_0 = round(f*math.atan((0-w/2)/f) + w/2)
 	xf = round(f*math.atan((w-w/2)/f) + w/2)
 	y_0 = round(f*((0-h/2)/math.sqrt(math.pow((0-w/2),2) + math.pow(f,2))) + h/2)
-	w_img = np.zeros((h,xf-x_0,3), dtype=np.uint8)
+	w_img = np.zeros((h,w,3), dtype=np.uint8)
 	for x in range(w):
 		for y in range(h):
-			x_ = round(f*math.atan((x-w/2)/f) + w/2 - x_0)
+			x_ = round(f*math.atan((x-w/2)/f) + w/2)
 			y_ = round(f*((y-h/2)/math.sqrt(math.pow((x-w/2),2) + math.pow(f,2))) + h/2)
 			if x_ < 0 or y_ < 0 or x_ >= xf-x_0 or y_ >= h:
 				pass
@@ -57,15 +57,22 @@ def blending(img1, img2, shift):
 	im_2_h, im_2_w,_ = img2.shape
 	im_1_h, im_1_w,_ = img1.shape
 	result_image = np.zeros((result_h,result_w,3))
-	result_image[result_h - im_1_h: result_h, result_w - im_1_w: result_w] = img1
-	result_image[0:im_2_h,0:im_2_w] = img2
+	result_image[result_h - im_1_h: result_h, result_w - im_1_w: result_w] = 0.9*img1
+	result_image[0:im_2_h,0:im_2_w] = 0.9*img2
 
 
-	centre = int((im_2_w + result_w - im_1_w )/2)
+	centre = int((im_2_w + result_w - im_1_w )/2) 
 	start = result_w - im_1_w #img1
-	start = centre
 	end = im_2_w
-	for x in range(centre, end):
+	
+	#start = end - 10
+	'''for x in range(start, end):
+		for y in range(0,im_2_h):
+			result_image[y][x] = 0.8*result_image[y][x]'''
+
+	start = int((centre + end) /2)
+
+	for x in range(start, end):
 		for y in range(0,im_2_h):
 			result_image[y][x] = ((end-x)/(end-start))*img2[y][x] + ((x-start)/(end-start))*img1[y-result_h + im_1_h][x-result_w + im_1_w]
 

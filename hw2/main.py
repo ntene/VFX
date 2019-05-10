@@ -9,7 +9,7 @@ def readimg(path):
 	img = []
 	with open(os.path.join(path,'list'), 'r') as f:
 		for line in f:
-			img.append(cv2.imread(path+line.strip()))
+			img.append(cv2.imread(os.path.join(path,line.strip())))
 	return img
 
 def readf(path):
@@ -26,15 +26,17 @@ if __name__ == '__main__':
 	features = []
 	descriptors = []
 	warp_img = []
-	for i,element in enumerate(img):
+	for i,element in enumerate(img[0:2]):
 		element = warping(element)
 		warp_img.append(element)
 		feature = HarrisDetection(element)
 		features.append(feature)
 		descriptors.append( gen_descriptor(element, features[i]) )
+		print ("done dectection photos",i)
 	#features = np.save("features",features)
 	feature_maps = feature_matching(warp_img, features, descriptors)
 	
+	cv2.imwrite("warp.jpg",warp_img[0])
 	print ("done feature_maps", [len(x) for x in feature_maps])
 	result = warp_img[0]
 	for i,feature in enumerate(feature_maps):
