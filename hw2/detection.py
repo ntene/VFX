@@ -13,14 +13,14 @@ def HarrisDetection(img, blocksize=4, k=0.05):
 	cv2.imwrite("gray.jpg",gray)
 
 	# sample show
+	'''
 	dest = cv2.cornerHarris(gray, blocksize, 5, k)
 	dest = cv2.dilate(dest, None)
 	image = img.copy()
 	image[dest > 0.05 * dest.max()]=[0, 0, 255]
 	keylist = np.array(np.where(dest > 0.05 * dest.max())).T
-	#print (keylist.shape)
 	cv2.imwrite('sample.jpg',image)
-	#return keylist
+	'''
 	###
 
 	dx, dy = gradient(gray)
@@ -47,10 +47,12 @@ def HarrisDetection(img, blocksize=4, k=0.05):
 	keylist = np.array(keylist)[:2000, :2].astype('int')
 	
 	# show
+	'''
 	image = img.copy()
 	for key in keylist:
 		image[key[0]][key[1]] = [0,0,255]
 	cv2.imwrite('corner.jpg', image)
+	'''
 	###
 
 	return np.array(keylist)

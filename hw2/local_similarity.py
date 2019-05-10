@@ -52,6 +52,7 @@ def query_KDT(a,b,imga,imgb):
 			feature_map.append([i, query_result_idx[i][0]])
 	
 	# show
+	'''
 	newimg = np.zeros((height, width*2, 3), np.uint8)
 	newimg[:, :width] = imgb
 	newimg[:, width:] = imga
@@ -61,6 +62,7 @@ def query_KDT(a,b,imga,imgb):
 		pt_b = (int(dot_set_b[fm[1],1]), int(dot_set_b[fm[1],0]))
 		cv2.line(newimg, pt_a, pt_b, (255, 0, 0))
 	cv2.imwrite('matches.jpg', newimg)
+	'''
 	###
 	return feature_map
 
