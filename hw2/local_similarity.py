@@ -47,8 +47,8 @@ def query_KDT(a,b,imga,imgb):
 	query_result_distance, query_result_idx = kdt_b.query(hist_a, k=1)
 	
 	feature_map = []
-	for i in range(len(hist_b)):
-		if query_result_distance[i] < 250 and dot_set_a[i,1] < width/2 and dot_set_b[query_result_idx[i],1] > width/2:
+	for i in range(len(hist_a)):
+		if query_result_distance[i] < 250 and dot_set_a[i,1] < width/1.5 and dot_set_b[query_result_idx[i],1] > width/1.5:
 			feature_map.append([i, query_result_idx[i][0]])
 	
 	# show
@@ -62,7 +62,6 @@ def query_KDT(a,b,imga,imgb):
 		cv2.line(newimg, pt_a, pt_b, (255, 0, 0))
 	cv2.imwrite('matches.jpg', newimg)
 	###
-	print (np.array(feature_map).shape)
 	return feature_map
 
 def feature_matching(imgs, features, descriptors):
